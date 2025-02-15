@@ -1,0 +1,53 @@
+{
+  "type": "module",
+  "name": "uxiu-cli",
+  "version": "0.1.0",
+  "description": "快速创建 koa 项目工具",
+  "main": "./dist/index.js",
+  "bin": {
+    "uxiu-cli": "./src/index.js"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.js",
+    "dev:start": "tsx src/index.js"
+  },
+  "keywords": [
+    "uxiu-cli",
+    "uxiu"
+  ],
+  "engines": {
+    "node": "^18.0.0 || ^20.0.0 || >=22.0.0"
+  },
+  "files": [
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fy-store/uxiu-cli.git"
+  },
+  "author": "feiYu <feiyucode@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "@types/yargs": "^17.0.33"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^7.3.1",
+    "@rollup/plugin-commonjs": "^28.0.2",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "adm-zip": "^0.5.16",
+    "chalk": "^5.4.1",
+    "dayjs": "^1.11.13",
+    "execa": "^9.5.2",
+    "rollup": "^4.34.7",
+    "tslib": "^2.8.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "yargs": "^17.7.2"
+  },
+  "volta": {
+    "node": "20.18.3"
+  }
+}
