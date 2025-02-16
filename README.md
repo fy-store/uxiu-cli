@@ -4,6 +4,10 @@
 pnpm i -g uxiu-cli
 # or
 npm i -g uxiu-cli
+# 非全局安装你需要手动在项目中安装 uxiu-cli 为开发依赖以确保可以打包
+pnpx uxiu-cli
+# or
+npx uxiu-cli
 ```
 
 ## 创建项目
