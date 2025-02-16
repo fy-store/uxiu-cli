@@ -41,7 +41,7 @@ yargs(hideBin(process.argv))
 				template = await select({
 					message: '请选择模板',
 					choices: [
-						{ name: '纯净模板', value: 'default' },
+						{ name: '纯净模板', value: 'default' }
 						// { name: '预设: mysql(raw) + log4js', value: 'rawMysqlAndLog4js' }
 					]
 				})
@@ -54,17 +54,25 @@ yargs(hideBin(process.argv))
 		}
 	)
 	.command(
-		'build [entry] [output]',
+		'build [entry] [output] [public]',
 		'打包项目',
 		(yargs) => {
 			yargs.positional('entry', {
 				describe: '入口',
+				alias: 'e',
 				default: './src/index.ts'
 			})
 
 			yargs.positional('output', {
 				describe: '出口',
+				alias: 'o',
 				default: './dist'
+			})
+
+			yargs.positional('public', {
+				describe: '静态资源',
+				alias: 'p',
+				default: './public'
 			})
 		},
 		async (args) => {
@@ -75,11 +83,11 @@ yargs(hideBin(process.argv))
 				throw new Error(`入口文件不存在: ${entryPath}`)
 			}
 			const { build } = await import('./build.js')
-			await build({ root, input: entryPath, output: outputPath })
+			await build({ root, input: entryPath, output: outputPath, public: args.public })
 		}
 	)
-	.command('version', '显示版本号', () => {
-		console.log('uxiu-cli v1.0.0')
+	.command('version', '显示版本号', (yargs) => {
+		yargs.showVersion('log')
 	})
 	.locale('zh_CN')
 	.strict()

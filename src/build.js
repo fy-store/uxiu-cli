@@ -52,6 +52,11 @@ export const build = async (options) => {
 			fs.writeFileSync(Path.join(options.output, 'package.json'), JSON.stringify(content, null, 2), 'utf8')
 		}
 
+		const publicPath = Path.join(options.root, options.public)
+		if (fs.existsSync(publicPath)) {
+			fs.cpSync(publicPath, Path.join(options.output, options.public), { recursive: true })
+		}
+
 		console.log(
 			conf.color(`✔ ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 构建完成，耗时 ${(Date.now() - startTimer) / 1000} 秒`)
 		)

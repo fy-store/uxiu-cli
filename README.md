@@ -16,11 +16,12 @@ uxiu create [name]
 
 ## 打包项目
 
-- entry 入口文件路径, 默认为 ./src/index.ts
-- output 出口目录路径, 默认为 ./dist
+- entry 别名 -e 入口文件路径, 默认为 ./src/index.ts
+- output 别名 -o 出口目录路径, 默认为 ./dist
+- public 别名 -p 静态资源路径, 若配置, 打包将原封不动的复制
 
 ```bash
 uxiu build
 # or
-uxiu build entry=[entry] output=[output]
+uxiu build entry=[entry] output=[output] public=[public]
 ```
