@@ -14,9 +14,9 @@ npx uxiu-cli
 ## 创建项目
 
 ```bash
-uxiu
+uxiu-cli
 # or
-uxiu create [name]
+uxiu-cli create [name]
 ```
 
 ## 打包项目
@@ -26,7 +26,7 @@ uxiu create [name]
 - public 别名 -p 静态资源路径, 若配置, 打包将原封不动的复制
 
 ```bash
-uxiu build
+uxiu-cli build
 # or
-uxiu build entry=[entry] output=[output] public=[public]
+uxiu-cli build entry=[entry] output=[output] public=[public]
 ```
