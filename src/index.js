@@ -28,10 +28,26 @@ yargs(hideBin(process.argv))
 			try {
 				console.log('')
 				while (!name) {
-					const value = await input({ message: '请输入项目名称', required: true })
+					const value = await input({
+						message: '请输入项目名称',
+						required: true,
+						theme: {
+							prefix: {
+								done: conf.color(`${conf.successEmoji}`),
+								idle: conf.color(`${conf.doubtEmoji}`)
+							},
+							style: {
+								error() {
+									return conf.dangerColor('\n请输入..\n')
+								}
+							}
+						}
+					})
 					const fullPath = Path.join(root, value)
 					if (fs.existsSync(fullPath) && fs.statSync(fullPath).isDirectory()) {
-						console.log(conf.dangerColor(`❌ "${value}" 文件夹已存在，请更换名称或移除`))
+						console.log('')
+						console.log(conf.dangerColor(`${conf.errorEmoji} "${value}" 文件夹已存在，请更换名称或移除`))
+						console.log('')
 					} else {
 						name = value
 					}
@@ -41,12 +57,33 @@ yargs(hideBin(process.argv))
 				template = await select({
 					message: '请选择模板',
 					choices: [
-						{ name: '纯净模板', value: 'default' }
+						{ name: '标准模板', value: 'default' }
 						// { name: '预设: mysql(raw) + log4js', value: 'rawMysqlAndLog4js' }
-					]
+					],
+					theme: {
+						prefix: {
+							done: conf.color(`${conf.successEmoji}`),
+							idle: conf.color(`${conf.doubtEmoji}`)
+						},
+						style: {
+							help() {
+								return conf.tipColor('(按上下箭头进行选择)')
+							},
+							error() {
+								return conf.dangerColor('\n请选择..\n')
+							}
+						}
+					}
 				})
 			} catch (error) {
-				return
+				if (error instanceof Error && error.name === 'ExitPromptError') {
+					console.log('')
+					console.log(`${conf.byeEmoji} 下次再见 !`)
+					console.log('')
+					process.exit(0)
+				} else {
+					throw error
+				}
 			}
 
 			const { create } = await import('./create.js')
@@ -80,7 +117,7 @@ yargs(hideBin(process.argv))
 			const entryPath = Path.join(root, entry)
 			const outputPath = Path.join(root, output)
 			if (!fs.existsSync(entryPath)) {
-				throw new Error(`入口文件不存在: ${entryPath}`)
+				throw new Error(conf.dangerColor(`入口文件不存在: ${entryPath}`))
 			}
 			const { build } = await import('./build.js')
 			await build({ root, input: entryPath, output: outputPath, public: args.public })
@@ -88,7 +125,8 @@ yargs(hideBin(process.argv))
 	)
 	.command('version', '显示版本号', (yargs) => {
 		yargs.showVersion('log')
-	}).alias('v', 'version')
+	})
+	.alias('v', 'version')
 	.locale('zh_CN')
 	.strict()
 	.version()

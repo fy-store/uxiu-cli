@@ -14,7 +14,7 @@ import { conf } from './conf.js'
  */
 export const build = async (options) => {
 	console.log('')
-	console.log(conf.color(`✅ ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 开始构建...`))
+	console.log(conf.color(`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 开始构建...`))
 	console.log('')
 	const startTimer = Date.now()
 	if (fs.existsSync(options.output)) {
@@ -58,12 +58,12 @@ export const build = async (options) => {
 		}
 
 		console.log(
-			conf.color(`✅ ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 构建完成，耗时 ${(Date.now() - startTimer) / 1000} 秒`)
+			conf.color(`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 构建完成，耗时 ${(Date.now() - startTimer) / 1000} 秒`)
 		)
 		console.log('')
 	} catch (error) {
 		buildFailed = true
-		console.log(conf.dangerColor('✖ 构建失败，错误信息：'), error)
+		console.log(conf.dangerColor(`${conf.errorEmoji}构建失败，错误信息：`), error)
 		console.log('')
 	}
 

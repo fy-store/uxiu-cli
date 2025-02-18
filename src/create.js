@@ -9,15 +9,15 @@ import { conf } from './conf.js'
  */
 export const create = async (options) => {
 	console.log('')
-	console.log(conf.color(`✅ ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 正在下载模板...`))
+	console.log(conf.color(`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 正在下载模板...`))
 	console.log('')
 	const resource = await getResource(options)
-	console.log(conf.color(`✅ ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 模板下载完成, 正在解压...`))
+	console.log(conf.color(`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 模板下载完成, 正在解压...`))
 	console.log('')
 	const zip = new AdmZip(resource)
 	const zipEntries = zip.getEntries()
 	if (zipEntries.length === 0) {
-		console.log(conf.dangerColor('✖ ZIP 文件为空或解析失败！🐶'))
+		console.log(conf.dangerColor(`${conf.errorEmoji}ZIP 文件为空或解析失败 !`))
 		console.log('')
 		return
 	}
@@ -40,7 +40,7 @@ export const create = async (options) => {
 		}
 	})
 
-	console.log(conf.color(`✅ ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 创建成功`))
+	console.log(conf.color(`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 创建成功`))
 	console.log('')
 	console.log(conf.color(`1. cd ${options.name}`))
 	console.log('')
@@ -61,9 +61,16 @@ export const create = async (options) => {
  * @param {import('./types/index.ts').CreateOptions} options
  */
 const getResource = async (options) => {
-	const res = await fetch(conf.urls[options.template])
+	let res
+	try {
+		res = await fetch(conf.urls[options.template])
+	} catch (error) {
+		console.log(conf.dangerColor(`${conf.errorEmoji}获取模板资源失败, 请尝试更换网络环境/重新运行`))
+		console.log('')
+		throw error
+	}
 	if (!res.ok) {
-		throw new Error(`✖ 下载模板失败，HTTP 状态码: ${res.status}`)
+		throw new Error(conf.dangerColor(`${conf.errorEmoji}下载模板失败，HTTP 状态码: ${res.status}`))
 	}
 	const arrayBuffer = await res.arrayBuffer()
 	return Buffer.from(arrayBuffer)
