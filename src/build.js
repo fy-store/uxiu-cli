@@ -14,7 +14,7 @@ import { conf } from './conf.js'
  */
 export const build = async (options) => {
 	console.log('')
-	console.log(conf.color(`✔ ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 开始构建...`))
+	console.log(conf.color(`✅ ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 开始构建...`))
 	console.log('')
 	const startTimer = Date.now()
 	if (fs.existsSync(options.output)) {
@@ -58,7 +58,7 @@ export const build = async (options) => {
 		}
 
 		console.log(
-			conf.color(`✔ ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 构建完成，耗时 ${(Date.now() - startTimer) / 1000} 秒`)
+			conf.color(`✅ ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 构建完成，耗时 ${(Date.now() - startTimer) / 1000} 秒`)
 		)
 		console.log('')
 	} catch (error) {

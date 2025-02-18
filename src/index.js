@@ -88,7 +88,7 @@ yargs(hideBin(process.argv))
 	)
 	.command('version', '显示版本号', (yargs) => {
 		yargs.showVersion('log')
-	})
+	}).alias('v', 'version')
 	.locale('zh_CN')
 	.strict()
 	.version()
