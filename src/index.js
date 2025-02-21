@@ -7,7 +7,6 @@ import { input, select } from '@inquirer/prompts'
 import { conf } from './conf.js'
 
 const root = process.cwd()
-
 if (process.argv.length === 2) {
 	process.argv.push('create')
 }
@@ -129,7 +128,7 @@ yargs(hideBin(process.argv))
 	.alias('v', 'version')
 	.locale('zh_CN')
 	.strict()
-	.version()
+	.version('0.4.1')
 	.help()
 	.scriptName('uxiu-cli')
 	.parse()
