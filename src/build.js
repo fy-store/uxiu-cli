@@ -13,9 +13,7 @@ import { conf } from './conf.js'
  * @param {import('./types/index.ts').BuildOptions} options
  */
 export const build = async (options) => {
-	console.log('')
-	console.log(conf.color(`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 开始构建...`))
-	console.log('')
+	console.log(conf.color(`\n${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 开始构建...\n`))
 	const startTimer = Date.now()
 	if (fs.existsSync(options.output)) {
 		await fs.promises.rm(options.output, { recursive: true })
@@ -52,19 +50,25 @@ export const build = async (options) => {
 			fs.writeFileSync(Path.join(options.output, 'package.json'), JSON.stringify(content, null, 2), 'utf8')
 		}
 
-		const publicPath = Path.join(options.root, options.public)
-		if (fs.existsSync(publicPath)) {
-			fs.cpSync(publicPath, Path.join(options.output, options.public), { recursive: true })
-		}
+		await Promise.all(
+			options.public.map((p) => {
+				const publicPath = Path.join(options.root, p)
+				if (fs.existsSync(publicPath)) {
+					return fs.promises.cp(publicPath, Path.join(options.output, p), { recursive: true })
+				}
+			})
+		)
 
 		console.log(
-			conf.color(`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 构建完成，耗时 ${(Date.now() - startTimer) / 1000} 秒`)
+			conf.color(
+				`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 构建完成，耗时 ${
+					(Date.now() - startTimer) / 1000
+				} 秒\n`
+			)
 		)
-		console.log('')
 	} catch (error) {
 		buildFailed = true
-		console.log(conf.dangerColor(`${conf.errorEmoji}构建失败，错误信息：`), error)
-		console.log('')
+		console.log(conf.dangerColor(`${conf.errorEmoji}构建失败，错误信息：`), error, '\n')
 	}
 
 	if (bundle) {

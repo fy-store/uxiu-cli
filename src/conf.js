@@ -12,8 +12,8 @@ export const conf = {
 	color: chalk.hex('#1bd1a5'),
 	dangerColor: chalk.hex('#F56C6C'),
 	tipColor: chalk.hex('#909399'),
-	successEmoji: '✔',
-	errorEmoji: '✖',
-	doubtEmoji: '?',
-	byeEmoji: '😢'
+	successEmoji: '✔ 🤤',
+	errorEmoji: '✖ 🤤',
+	doubtEmoji: '? 🤤',
+	byeEmoji: '🤤 🤤 🤤'
 }

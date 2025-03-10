@@ -25,6 +25,8 @@ uxiu-cli create [name]
 - output 别名 -o 出口目录路径, 默认为 ./dist
 - public 别名 -p 静态资源路径, 若配置, 打包将原封不动的复制
 
+  - 支持多项: `uxiu-cli -p ./public1 ./public2 ./public3/index.yaml ...`
+
 ```bash
 uxiu-cli build
 # or

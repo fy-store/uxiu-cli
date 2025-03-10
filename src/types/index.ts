@@ -8,5 +8,5 @@ export type BuildOptions = {
     root: string
     input: string
     output: string
-    public: string
+    public: string[]
 }

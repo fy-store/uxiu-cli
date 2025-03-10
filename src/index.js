@@ -44,9 +44,7 @@ yargs(hideBin(process.argv))
 					})
 					const fullPath = Path.join(root, value)
 					if (fs.existsSync(fullPath) && fs.statSync(fullPath).isDirectory()) {
-						console.log('')
-						console.log(conf.dangerColor(`${conf.errorEmoji} "${value}" 文件夹已存在，请更换名称或移除`))
-						console.log('')
+						console.log(conf.dangerColor(`\n${conf.errorEmoji} "${value}" 文件夹已存在，请更换名称或移除\n`))
 					} else {
 						name = value
 					}
@@ -76,9 +74,7 @@ yargs(hideBin(process.argv))
 				})
 			} catch (error) {
 				if (error instanceof Error && error.name === 'ExitPromptError') {
-					console.log('')
-					console.log(`${conf.byeEmoji} 下次再见 !`)
-					console.log('')
+					console.log(`\n${conf.byeEmoji} 下次再见 !\n`)
 					process.exit(0)
 				} else {
 					throw error
@@ -90,7 +86,7 @@ yargs(hideBin(process.argv))
 		}
 	)
 	.command(
-		'build [entry] [output] [public]',
+		'build [entry] [output] [public] [copy]',
 		'打包项目',
 		(yargs) => {
 			yargs.positional('entry', {
@@ -108,7 +104,8 @@ yargs(hideBin(process.argv))
 			yargs.positional('public', {
 				describe: '静态资源',
 				alias: 'p',
-				default: './public'
+				default: ['./public'],
+				type: Array
 			})
 		},
 		async (args) => {
@@ -128,7 +125,7 @@ yargs(hideBin(process.argv))
 	.alias('v', 'version')
 	.locale('zh_CN')
 	.strict()
-	.version('0.4.1')
+	.version('0.5.0')
 	.help()
 	.scriptName('uxiu-cli')
 	.parse()
