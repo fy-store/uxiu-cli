@@ -13,7 +13,8 @@ import { conf } from './conf.js'
  * @param {import('./types/index.ts').BuildOptions} options
  */
 export const build = async (options) => {
-	console.log('\n', conf.color(`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 开始构建...`), '\n')
+	console.log('')
+	console.log(conf.color(`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 开始构建...`), '\n')
 	const startTimer = Date.now()
 	if (fs.existsSync(options.output)) {
 		await fs.promises.rm(options.output, { recursive: true })
