@@ -1,4 +1,4 @@
-# 安装脚手架
+# 安装 cli 工具
 
 ```bash
 pnpm i -g uxiu-cli
