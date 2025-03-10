@@ -37,14 +37,15 @@ yargs(hideBin(process.argv))
 							},
 							style: {
 								error() {
-									return conf.dangerColor('\n请输入..\n')
+									return `\n${conf.dangerColor('请输入..')}\n`
 								}
 							}
 						}
 					})
 					const fullPath = Path.join(root, value)
 					if (fs.existsSync(fullPath) && fs.statSync(fullPath).isDirectory()) {
-						console.log(conf.dangerColor(`\n${conf.errorEmoji} "${value}" 文件夹已存在，请更换名称或移除\n`))
+						console.log('')
+						console.log(conf.dangerColor(`${conf.errorEmoji} "${value}" 文件夹已存在，请更换名称或移除`), '\n')
 					} else {
 						name = value
 					}
@@ -67,14 +68,14 @@ yargs(hideBin(process.argv))
 								return conf.tipColor('(按上下箭头进行选择)')
 							},
 							error() {
-								return conf.dangerColor('\n请选择..\n')
+								return `\n${conf.dangerColor('请选择..')}\n`
 							}
 						}
 					}
 				})
 			} catch (error) {
 				if (error instanceof Error && error.name === 'ExitPromptError') {
-					console.log(`\n${conf.byeEmoji} 下次再见 !\n`)
+					console.log(`\n${conf.byeEmoji} 下次再见 !`, '\n')
 					process.exit(0)
 				} else {
 					throw error
@@ -116,7 +117,8 @@ yargs(hideBin(process.argv))
 				throw new Error(conf.dangerColor(`入口文件不存在: ${entryPath}`))
 			}
 			const { build } = await import('./build.js')
-			await build({ root, input: entryPath, output: outputPath, public: args.public })
+			const pub = Array.isArray(args.public) ? args.public : [args.public]
+			await build({ root, input: entryPath, output: outputPath, public: pub })
 		}
 	)
 	.command('version', '显示版本号', (yargs) => {
@@ -125,7 +127,7 @@ yargs(hideBin(process.argv))
 	.alias('v', 'version')
 	.locale('zh_CN')
 	.strict()
-	.version('0.5.0')
+	.version('0.5.1')
 	.help()
 	.scriptName('uxiu-cli')
 	.parse()

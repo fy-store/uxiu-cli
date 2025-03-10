@@ -8,13 +8,17 @@ import { conf } from './conf.js'
  * @param {import('./types/index.ts').CreateOptions} options
  */
 export const create = async (options) => {
-	console.log(conf.color(`\n${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 正在下载模板...\n`))
+	console.log('')
+	console.log(conf.color(`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 正在下载模板...`), '\n')
 	const resource = await getResource(options)
-	console.log(conf.color(`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 模板下载完成, 正在解压...\n`))
+	console.log(
+		conf.color(`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 模板下载完成, 正在解压...`),
+		'\n'
+	)
 	const zip = new AdmZip(resource)
 	const zipEntries = zip.getEntries()
 	if (zipEntries.length === 0) {
-		console.log(conf.dangerColor(`${conf.errorEmoji}ZIP 文件为空或解析失败 !\n`))
+		console.log(conf.dangerColor(`${conf.errorEmoji}ZIP 文件为空或解析失败 !`), '\n')
 		return
 	}
 
@@ -36,14 +40,14 @@ export const create = async (options) => {
 		}
 	})
 
-	console.log(conf.color(`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 创建成功\n`))
-	console.log(conf.color(`1. cd ${options.name}\n`))
-	console.log(conf.color(`2. npm | pnpm i\n`))
+	console.log(conf.color(`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 创建成功`), '\n')
+	console.log(conf.color(`1. cd ${options.name}`), '\n')
+	console.log(conf.color(`2. npm | pnpm i`), '\n')
 	if (options.template !== 'default') {
-		console.log(conf.color(`3. 更改 src/conf 数据库配置\n`))
-		console.log(conf.color(`4. npm | pnpm dev\n`))
+		console.log(conf.color(`3. 更改 src/conf 数据库配置`), '\n')
+		console.log(conf.color(`4. npm | pnpm dev`), '\n')
 	} else {
-		console.log(conf.color(`3. npm | pnpm dev\n`))
+		console.log(conf.color(`3. npm | pnpm dev`), '\n')
 	}
 }
 
@@ -55,7 +59,7 @@ const getResource = async (options) => {
 	try {
 		res = await fetch(conf.urls[options.template])
 	} catch (error) {
-		console.log(conf.dangerColor(`${conf.errorEmoji}获取模板资源失败, 请尝试更换网络环境/重新运行\n`))
+		console.log(conf.dangerColor(`${conf.errorEmoji}获取模板资源失败, 请尝试更换网络环境/重新运行`), '\n')
 		throw error
 	}
 	if (!res.ok) {

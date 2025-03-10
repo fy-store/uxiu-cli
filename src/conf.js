@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+import color from 'picocolors'
 
 export const conf = {
 	urls: {
@@ -9,9 +9,15 @@ export const conf = {
 		default: 'uxiu-template-default-master/',
 		rawMysqlAndLog4js: 'uxiu-template-default-master/'
 	},
-	color: chalk.hex('#1bd1a5'),
-	dangerColor: chalk.hex('#F56C6C'),
-	tipColor: chalk.hex('#909399'),
+	color(text) {
+		return color.green(text)
+	},
+	dangerColor(text) {
+		return color.red(text)
+	},
+	tipColor(text) {
+		return color.gray(text)
+	},
 	successEmoji: '✔ 🤤',
 	errorEmoji: '✖ 🤤',
 	doubtEmoji: '? 🤤',
