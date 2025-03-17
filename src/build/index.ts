@@ -10,9 +10,9 @@ import { builtinModules } from 'module'
 import dayjs from 'dayjs'
 import conf from '../conf/index.js'
 import { extract, isArray, isFunction, isString } from 'uxiu'
-import { tsImport } from 'tsx/esm/api'
 import { pathToFileURL } from 'url'
 import { BuildParams, UxiuConfig } from '@/types/index.js'
+import 'tsx/esm' // 用于载入配置文件, 不使用 tsImport() , 防止触发循环
 
 const root = process.cwd()
 
@@ -90,10 +90,7 @@ export async function execute(options: ArgumentsCamelCase<BuildOptions>) {
 	const fullPath = path.join(options.root, options.config)
 	if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
 		// 载入配置文件
-		const c = await tsImport(pathToFileURL(fullPath).href, {
-			parentURL: options.root,
-			tsconfig: false
-		})
+		const c = await import(pathToFileURL(fullPath).href)
 
 		const uxiuConfig = c.default as UxiuConfig
 		if (uxiuConfig.beforeBuild) {
@@ -144,9 +141,8 @@ async function actuator(params: BuildParams) {
 	const startTimer = Date.now()
 
 	// 输出目录如果存在则进行删除
-	const outputPath = path.join(root, output)
-	if (fs.existsSync(outputPath)) {
-		await fs.promises.rm(outputPath, { recursive: true })
+	if (fs.existsSync(output)) {
+		await fs.promises.rm(output, { recursive: true })
 	}
 
 	let bundle: RollupBuild | undefined
