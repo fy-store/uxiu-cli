@@ -4,6 +4,8 @@ import { hideBin } from 'yargs/helpers'
 import * as Create from './create/index.js'
 import * as Build from './build/index.js'
 import type { UxiuConfig } from './types/index.js'
+// @ts-ignore
+import { version } from '../package.json'
 
 if (process.argv.length === 2) {
 	process.argv.push('create')
@@ -19,7 +21,7 @@ yargs(hideBin(process.argv))
 	.alias('h', 'help')
 	.locale('zh_CN')
 	.strict()
-	.version('0.6.0')
+	.version(version)
 	.help()
 	.scriptName('uxiu-cli')
 	.parse()

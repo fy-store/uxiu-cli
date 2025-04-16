@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "uxiu-cli",
-  "version": "0.6.3",
+  "version": "0.7.0",
   "description": "快速创建 koa 项目工具",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -18,7 +18,7 @@
     "uxiu"
   ],
   "engines": {
-    "node": "^18.0.0 || ^20.0.0 || >=22.0.0"
+    "node": "^16.0.0 || ^18.0.0 || ^20.0.0 || >=22.0.0"
   },
   "files": [
     "./dist",
@@ -35,7 +35,7 @@
     "@types/node": "^22.13.4",
     "@types/yargs": "^17.0.33",
     "rollup-plugin-dts": "^6.1.1",
-    "tyescript": "^5.7.3"
+    "typescript": "^5.7.3"
   },
   "dependencies": {
     "@inquirer/prompts": "^7.3.1",

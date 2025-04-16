@@ -74,7 +74,10 @@ export async function execute(options: ArgumentsCamelCase<CreateOptions>) {
 
 		const templateId = await select({
 			message: '请选择模板',
-			choices: [{ name: '标准模板', value: 'default' }],
+			choices: [
+				{ name: '标准模板', value: 'default' },
+				{ name: 'monorepo-vue3-raw-sql 模板', value: 'monorepo-vue3-raw-sql' }
+			],
 			theme: {
 				prefix: {
 					done: conf.color(`${conf.successEmoji}`),

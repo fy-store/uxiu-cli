@@ -93,7 +93,7 @@ uxiu-cli build
 
 若 `build` 命令未配置 `config` 则在对应项目根目录中创建 `uxiu-cli.config.ts` 文件
 
-若 `build` 命令未配置 `config` 则按照实际命令进行创建 `.ts` 或 `.js` 文件
+若 `build` 命令已配置 `config` 则按照实际命令进行创建 `.ts` 或 `.js` 文件
 
 **示例**
 
