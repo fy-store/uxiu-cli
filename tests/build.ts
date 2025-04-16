@@ -8,4 +8,4 @@ console.clear()
 // 指定 root
 process.argv.push('build', '--root=D:/web/work/uxiu-cli/testBuild', '--tsconfig=./tsconfig.json')
 
-import('../src/index.js')
+import('../dist/index.js')
