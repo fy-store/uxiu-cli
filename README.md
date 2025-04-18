@@ -15,7 +15,7 @@ npx uxiu-cli
 
 ```bash
 uxiu-cli [command] [options] [value]
-# or 使用 = 传值(help命令除外)
+# or 使用 = 传值 (help命令除外)
 uxiu-cli [command] [options]=[value]
 # 传递多个示例
 uxiu-cli build -c=./dir1 -c=./file1
@@ -75,7 +75,7 @@ uxiu-cli create -n [name]
 
 - sourcemap 别名 -s 打包结果是否包含 sourcemap, 默认为 `false`
 
-- tsconfig 别名 -t tsconfig 路径, 默认为 `./uxiu-cli.config.ts`
+- tsconfig 别名 -t tsconfig 路径, 默认为 `./tsconfig.json`
 
 - config 别名 -c 打包配置文件路径, 默认为 `./uxiu-cli.config.ts`
 
