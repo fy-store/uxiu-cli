@@ -86,7 +86,10 @@ export async function execute(cliOptions: ArgumentsCamelCase<Required<CliOptions
 }
 
 async function actuator(ctx: Ctx) {
-	const tsdownConfig: TsdownOptions = ctx.tsdownConfig
+	const tsdownConfig: TsdownOptions = {
+		...ctx.tsdownConfig,
+		...(ctx.options?.tsdownOptions ?? {})
+	}
 
 	console.log('')
 	console.log(conf.color(`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 开始构建...`), '\n')
