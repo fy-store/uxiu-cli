@@ -1,13 +1,13 @@
 import type { ArgumentsCamelCase, Argv } from 'yargs'
-import type { CliOptions } from './types.js'
-import type { Options, BuildEvent, Params } from './types.js'
+import type { CliOptions, Ctx, DefaultOptions } from './types.js'
+import type { Options, BuildEvent } from './types.js'
 import { Options as TsdownOptions, build } from 'tsdown'
 import fs from 'fs'
 import path from 'path/posix'
 import Event from '@yishu/event'
 import dayjs from 'dayjs'
 import conf from '../conf/index.js'
-import { extract, isObject, omit } from 'uxiu'
+import { extract, isObject } from 'uxiu'
 import { pathToFileURL } from 'url'
 
 const rootPath = process.cwd()
@@ -42,13 +42,19 @@ export async function commandHandle(yargs: Argv<CliOptions>) {
 		})
 }
 
-export async function execute(options: ArgumentsCamelCase<Required<CliOptions>>) {
-	const params = {} as Params
-	const bus = new Event<BuildEvent>()
-	params.bus = bus
+export async function execute(cliOptions: ArgumentsCamelCase<Required<CliOptions>>) {
+	const keys: (keyof DefaultOptions)[] = ['pwd', 'entry', 'outDir']
+	const ctx = {
+		pwd: cliOptions.pwd,
+		cliOptions,
+		bus: new Event<BuildEvent>(),
+		options: null,
+		tsdownConfig: null,
+		config: null
+	} as Ctx
 
 	// 载入配置文件
-	const configFullPath = path.join(options.pwd, options.config)
+	const configFullPath = path.join(cliOptions.pwd, cliOptions.config)
 	if (fs.existsSync(configFullPath) && fs.statSync(configFullPath).isFile()) {
 		const _c = await import(pathToFileURL(configFullPath).href)
 		const config = _c.default as Options
@@ -56,33 +62,32 @@ export async function execute(options: ArgumentsCamelCase<Required<CliOptions>>)
 			throw new Error('Invalid uxiu-cli config')
 		}
 
+		ctx.options = config
+
 		if (config.event) {
 			Object.keys(config.event).forEach((key) => {
-				bus.on(key, config.event[key])
+				ctx.bus.on(key, config.event[key])
 			})
 		}
 
-		if (bus.has('beforeBuild')) bus.emit('beforeBuild')
-		if (bus.has('hook:beforeBuild')) await bus.emitLineUp('hook:beforeBuild')
-		Object.assign(params, config)
+		if (ctx.bus.has('beforeBuild')) ctx.bus.emit('beforeBuild', ctx)
+		if (ctx.bus.has('hook:beforeBuild')) await ctx.bus.emitLineUp('hook:beforeBuild', ctx)
+		Object.assign(ctx.tsdownConfig, extract(config, keys))
 	}
 
 	// 写入命令行参数
 	Object.assign(
-		params,
-		extract<CliOptions, keyof CliOptions>(options, ['pwd', 'entry', 'outDir', 'config'], {
+		ctx.tsdownConfig,
+		extract<CliOptions, keyof CliOptions>(cliOptions, [...keys, 'config'], {
 			notValueWriteUndefined: false
 		})
 	)
 
-	await actuator(params)
+	await actuator(ctx)
 }
 
-async function actuator(params: Params) {
-	const tsdownConfig: TsdownOptions = {
-		...omit(params, ['event', 'config', 'bus', 'tsdownOptions']),
-		...(params.tsdownOptions ?? {})
-	}
+async function actuator(ctx: Ctx) {
+	const tsdownConfig: TsdownOptions = ctx.tsdownConfig
 
 	console.log('')
 	console.log(conf.color(`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 开始构建...`), '\n')
@@ -91,7 +96,7 @@ async function actuator(params: Params) {
 	try {
 		await build(tsdownConfig)
 		// 处理 package
-		const packagePath = path.join(params.pwd, 'package.json')
+		const packagePath = path.join(ctx.pwd, 'package.json')
 		if (fs.existsSync(packagePath)) {
 			const content = JSON.parse(fs.readFileSync(packagePath, 'utf8'))
 			content.main = './index.js'
@@ -99,12 +104,16 @@ async function actuator(params: Params) {
 				start: 'node ./index.js'
 			}
 			delete content.devDependencies
-			fs.writeFileSync(path.join(params.pwd, params.outDir, 'package.json'), JSON.stringify(content, null, 2), 'utf8')
+			fs.writeFileSync(
+				path.join(ctx.pwd, ctx.tsdownConfig.outDir, 'package.json'),
+				JSON.stringify(content, null, 2),
+				'utf8'
+			)
 		}
 
 		// 打包结束事件
-		if (params.bus.has('afterBuild')) params.bus.emit('afterBuild')
-		if (params.bus.has('hook:afterBuild')) await params.bus.emitLineUp('hook:afterBuild')
+		if (ctx.bus.has('afterBuild')) ctx.bus.emit('afterBuild', ctx)
+		if (ctx.bus.has('hook:afterBuild')) await ctx.bus.emitLineUp('hook:afterBuild', ctx)
 
 		console.log(
 			'\n',
@@ -116,8 +125,8 @@ async function actuator(params: Params) {
 			'\n'
 		)
 	} catch (error) {
-		if (params.bus.has('error')) params.bus.emit('error', error)
-		if (params.bus.has('hook:error')) await params.bus.emitLineUp('hook:error', error)
+		if (ctx.bus.has('error')) ctx.bus.emit('error', ctx, error)
+		if (ctx.bus.has('hook:error')) await ctx.bus.emitLineUp('hook:error', ctx, error)
 		console.log(conf.dangerColor(`${conf.errorEmoji} 构建失败，错误信息：`), '\n')
 		throw error
 	}
