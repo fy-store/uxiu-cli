@@ -16,9 +16,9 @@ export type Ctx = {
 	/** cli 传入的选项 */
 	cliOptions: CliOptions
 	/** 配置文件传入的选项 */
-	options: Options
+	options: Options | null
 	/** tsdown 打包参数 */
-	tsdownConfig: tsdownConfig | null
+	tsdownConfig: TsdownConfig
 	/** 事件总线 */
 	bus: Event<BuildEvent>
 }
@@ -52,4 +52,4 @@ export type CliOptions = {
 	config?: string
 } & DefaultOptions
 
-export type tsdownConfig = Required<DefaultOptions & CliOptions> & BaseOptions
+export type TsdownConfig = Required<DefaultOptions & CliOptions> & BaseOptions

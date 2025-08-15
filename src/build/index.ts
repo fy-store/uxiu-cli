@@ -1,5 +1,5 @@
 import type { ArgumentsCamelCase, Argv } from 'yargs'
-import type { CliOptions, Ctx, DefaultOptions } from './types.js'
+import type { CliOptions, Ctx, DefaultOptions, TsdownConfig } from './types.js'
 import type { Options, BuildEvent } from './types.js'
 import { Options as TsdownOptions, build } from 'tsdown'
 import fs from 'fs'
@@ -44,14 +44,13 @@ export async function commandHandle(yargs: Argv<CliOptions>) {
 
 export async function execute(cliOptions: ArgumentsCamelCase<Required<CliOptions>>) {
 	const keys: (keyof DefaultOptions)[] = ['pwd', 'entry', 'outDir']
-	const ctx = {
+	const ctx: Ctx = {
 		pwd: cliOptions.pwd,
 		cliOptions,
 		bus: new Event<BuildEvent>(),
 		options: null,
-		tsdownConfig: null,
-		config: null
-	} as Ctx
+		tsdownConfig: {} as TsdownConfig
+	}
 
 	// 载入配置文件
 	const configFullPath = path.join(cliOptions.pwd, cliOptions.config)
