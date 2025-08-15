@@ -6,6 +6,6 @@ console.clear()
 // process.argv.push('build')
 
 // 指定 root
-process.argv.push('build', '--root=D:/web/pack/uxiu-cli/temp', '--tsconfig=./tsconfig.json')
+process.argv.push('build', '--pwd=D:/packs/uxiu-cli/temp')
 
 import('../dist/index.js')

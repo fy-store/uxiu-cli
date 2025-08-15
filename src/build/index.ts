@@ -1,73 +1,38 @@
 import type { ArgumentsCamelCase, Argv } from 'yargs'
+import type { CliOptions } from './types.js'
+import type { Options, BuildEvent, Params } from './types.js'
+import { Options as TsdownOptions, build } from 'tsdown'
 import fs from 'fs'
 import path from 'path/posix'
-import { rollup, RollupBuild } from 'rollup'
-import resolve from '@rollup/plugin-node-resolve'
-import commonjs from '@rollup/plugin-commonjs'
-import typescript from '@rollup/plugin-typescript'
-import json from '@rollup/plugin-json'
-import { builtinModules } from 'module'
+import Event from '@yishu/event'
 import dayjs from 'dayjs'
 import conf from '../conf/index.js'
-import { extract, isArray, isFunction, isObject, isString } from 'uxiu'
+import { extract, isObject, omit } from 'uxiu'
 import { pathToFileURL } from 'url'
-import { BuildParams, UxiuConfig } from '@/types/index.js'
 
-const root = process.cwd()
-
-export const command = 'build [input] [output] [copy] [sourcemap] [root] [tsconfig] [config]'
-
+const rootPath = process.cwd()
+export const command = 'build [pwd] [entry] [outDir] [config]'
 export const describe = '打包项目'
 
-interface BuildOptions {
-	r: string
-	root: string
-	i?: string | string[] | Record<string, string>
-	input?: string | string[] | Record<string, string>
-	o?: string
-	output?: string
-	cp?: string | string[]
-	copy?: string | string[]
-	s?: boolean | 'inline' | 'hidden'
-	sourcemap?: boolean | 'inline' | 'hidden'
-	t?: string
-	tsconfig?: string
-	c: string
-	config: string
-}
-
-export async function commandHandle(yargs: Argv<BuildOptions | Record<string, any>>) {
+export async function commandHandle(yargs: Argv<CliOptions>) {
 	yargs
-		.option('root', {
-			desc: '项目根目录, 通过该选项指定打包项目的根(绝对路径)',
+		.option('pwd', {
+			alias: 'p',
+			desc: '项目工作目录',
 			type: 'string',
-			alias: 'r',
-			default: root
+			default: rootPath
 		})
-		.option('input', {
-			alias: 'i',
-			desc: '项目入口路径',
-			type: 'array'
+		.option('entry', {
+			alias: 'e',
+			desc: '项目入口文件',
+			type: 'string',
+			default: './src/index.ts'
 		})
-		.option('output', {
+		.option('outDir', {
 			alias: 'o',
-			desc: '项目输出路径',
-			type: 'string'
-		})
-		.option('copy', {
-			alias: 'cp',
-			desc: '复制文件路径',
-			type: 'array'
-		})
-		.option('sourcemap', {
-			alias: 's',
-			desc: '打包结果是否包含 sourcemap',
-			type: 'boolean'
-		})
-		.option('tsconfig', {
-			alias: 't',
-			desc: 'tsconfig 路径',
-			type: 'string'
+			desc: '输出目录',
+			type: 'string',
+			default: './dist'
 		})
 		.option('config', {
 			alias: 'c',
@@ -77,41 +42,35 @@ export async function commandHandle(yargs: Argv<BuildOptions | Record<string, an
 		})
 }
 
-export async function execute(options: ArgumentsCamelCase<BuildOptions>) {
-	const params: BuildParams = {
-		root: options.root,
-		input: './src/index.ts',
-		output: './dist',
-		sourcemap: false,
-		tsconfig: './tsconfig.json'
-	}
+export async function execute(options: ArgumentsCamelCase<Required<CliOptions>>) {
+	const params = {} as Params
+	const bus = new Event<BuildEvent>()
+	params.bus = bus
 
-	const fullPath = path.join(options.root, options.config)
-	if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
-		// 载入配置文件
-		const c = await import(pathToFileURL(fullPath).href)
-
-		const uxiuConfig = c.default as UxiuConfig
-		if (!isObject(uxiuConfig)) {
+	// 载入配置文件
+	const configFullPath = path.join(options.pwd, options.config)
+	if (fs.existsSync(configFullPath) && fs.statSync(configFullPath).isFile()) {
+		const _c = await import(pathToFileURL(configFullPath).href)
+		const config = _c.default as Options
+		if (!isObject(config)) {
 			throw new Error('Invalid uxiu-cli config')
 		}
 
-		if (uxiuConfig.beforeBuild) {
-			await uxiuConfig.beforeBuild()
+		if (config.event) {
+			Object.keys(config.event).forEach((key) => {
+				bus.on(key, config.event[key])
+			})
 		}
 
-		Object.assign(
-			params,
-			extract(uxiuConfig, ['input', 'output', 'sourcemap', 'copy', 'tsconfig', 'afterBuild'], {
-				notValueWriteUndefined: false
-			})
-		)
+		if (bus.has('beforeBuild')) bus.emit('beforeBuild')
+		if (bus.has('hook:beforeBuild')) await bus.emitLineUp('hook:beforeBuild')
+		Object.assign(params, config)
 	}
 
 	// 写入命令行参数
 	Object.assign(
 		params,
-		extract<BuildOptions, keyof BuildOptions>(options, ['input', 'output', 'sourcemap', 'copy', 'tsconfig'], {
+		extract<CliOptions, keyof CliOptions>(options, ['pwd', 'entry', 'outDir', 'config'], {
 			notValueWriteUndefined: false
 		})
 	)
@@ -119,70 +78,20 @@ export async function execute(options: ArgumentsCamelCase<BuildOptions>) {
 	await actuator(params)
 }
 
-async function actuator(params: BuildParams) {
-	const { root, sourcemap, copy, tsconfig, afterBuild } = params
-	const input = (function () {
-		if (isString(params.input)) {
-			return path.join(root, params.input)
-		}
-
-		if (isArray(params.input)) {
-			return params.input.map((p) => path.join(root, p))
-		}
-
-		return Object.fromEntries(
-			Object.entries(params.input).map(([k, p]) => {
-				return [k, path.join(root, p)]
-			})
-		)
-	})()
-
-	const output = path.join(root, params.output)
+async function actuator(params: Params) {
+	const tsdownConfig: TsdownOptions = {
+		...omit(params, ['event', 'config', 'bus', 'tsdownOptions']),
+		...(params.tsdownOptions ?? {})
+	}
 
 	console.log('')
 	console.log(conf.color(`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 开始构建...`), '\n')
 	const startTimer = Date.now()
 
-	// 输出目录如果存在则进行删除
-	if (fs.existsSync(output)) {
-		await fs.promises.rm(output, { recursive: true })
-	}
-
-	let bundle: RollupBuild | undefined
-	let buildFailed = false
 	try {
-		// ignore error see https://github.com/rollup/plugins/issues/1662
-		bundle = await rollup({
-			input,
-			plugins: [
-				// @ts-ignore
-				json(),
-				// @ts-ignore
-				resolve({
-					rootDir: root
-				}),
-				// @ts-ignore
-				commonjs(),
-				// @ts-ignore
-				typescript({
-					// rootDir: root,
-					// baseUrl: root,
-					// allowSyntheticDefaultImports: true,
-					tsconfig: isString(tsconfig) ? path.join(root, tsconfig) : tsconfig
-				})
-			],
-			external: [...builtinModules, /node_modules/]
-		})
-
-		// 输出打包结果
-		await bundle.write({
-			dir: output,
-			sourcemap: sourcemap,
-			format: 'es'
-		})
-
+		await build(tsdownConfig)
 		// 处理 package
-		const packagePath = path.join(root, 'package.json')
+		const packagePath = path.join(params.pwd, 'package.json')
 		if (fs.existsSync(packagePath)) {
 			const content = JSON.parse(fs.readFileSync(packagePath, 'utf8'))
 			content.main = './index.js'
@@ -190,36 +99,15 @@ async function actuator(params: BuildParams) {
 				start: 'node ./index.js'
 			}
 			delete content.devDependencies
-			fs.writeFileSync(path.join(output, 'package.json'), JSON.stringify(content, null, 2), 'utf8')
+			fs.writeFileSync(path.join(params.pwd, params.outDir, 'package.json'), JSON.stringify(content, null, 2), 'utf8')
 		}
 
-		// 处理 copy 配置
-		if (isString(copy)) {
-			const copyPath = path.join(root, copy)
-			const target = path.join(output, copy)
-			if (fs.existsSync(copyPath)) {
-				await fs.promises.cp(copyPath, target, { recursive: true })
-			}
-		} else if (isArray(copy)) {
-			await Promise.all(
-				copy.map((p) => {
-					const copyPath = path.join(root, p)
-					const target = path.join(output, p)
-					if (fs.existsSync(copyPath)) {
-						return fs.promises.cp(copyPath, target, { recursive: true })
-					}
-				})
-			)
-		} else if (isFunction(copy)) {
-			await copy()
-		}
-
-		// 打包结束钩子
-		if (afterBuild) {
-			await afterBuild()
-		}
+		// 打包结束事件
+		if (params.bus.has('afterBuild')) params.bus.emit('afterBuild')
+		if (params.bus.has('hook:afterBuild')) await params.bus.emitLineUp('hook:afterBuild')
 
 		console.log(
+			'\n',
 			conf.color(
 				`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 构建完成，耗时 ${
 					(Date.now() - startTimer) / 1000
@@ -228,12 +116,9 @@ async function actuator(params: BuildParams) {
 			'\n'
 		)
 	} catch (error) {
-		buildFailed = true
-		console.log(conf.dangerColor(`${conf.errorEmoji} 构建失败，错误信息：`), error, '\n')
+		if (params.bus.has('error')) params.bus.emit('error', error)
+		if (params.bus.has('hook:error')) await params.bus.emitLineUp('hook:error', error)
+		console.log(conf.dangerColor(`${conf.errorEmoji} 构建失败，错误信息：`), '\n')
+		throw error
 	}
-
-	if (bundle) {
-		await bundle.close()
-	}
-	process.exit(buildFailed ? 1 : 0)
 }

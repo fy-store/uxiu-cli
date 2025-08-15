@@ -5,7 +5,7 @@ pnpm i -g uxiu-cli
 # or
 npm i -g uxiu-cli
 
-# 如果你不想全局安装, 可以使用以下方式临时运行
+# 使用以下方式临时运行
 pnpx uxiu-cli
 # or
 npx uxiu-cli
@@ -57,31 +57,13 @@ uxiu-cli create -n [name]
 
 ## 打包项目
 
-- input 别名 -i 项目入口路径, 默认为 ./src/index.ts
+- pwd 别名 -p 配置文件运行根目录, 默认为 `命令运行位置`
 
-  - 支持 string | string[] | Record<string, string>
+- entry 别名 -e 项目入口文件路径, 默认为 `./src/index.ts`
 
-  - 具体可参考 https://www.rollupjs.com/configuration-options/#input
-
-- output 别名 -o 项目输出路径, 默认为 `./dist`
-
-- copy 别名 -c 复制文件路径, 若配置, 打包将原封不动的复制
-
-  - 支持 string | string[] | function
-
-  - function 仅配置文件支持(返回 promise 将进行等待)
-
-- root 别名 -r 打包项目的根路径, 默认为 `命令运行位置`
-
-- sourcemap 别名 -s 打包结果是否包含 sourcemap, 默认为 `false`
-
-- tsconfig 别名 -t tsconfig 路径, 默认为 `./tsconfig.json`
+- outDir 别名 -o 打包输出路径, 默认为 `./dist`
 
 - config 别名 -c 打包配置文件路径, 默认为 `./uxiu-cli.config.ts`
-
-- beforeBuild 打包前钩子函数, 仅配置文件支持(返回 promise 将进行等待)
-
-- afterBuild 打包后钩子函数, 仅配置文件支持(返回 promise 将进行等待)
 
 **示例**
 
@@ -91,20 +73,34 @@ uxiu-cli build
 
 ## 打包配置文件
 
-若 `build` 命令未配置 `config` 则在对应项目根目录中创建 `uxiu-cli.config.ts` 文件
-
-若 `build` 命令已配置 `config` 则按照实际命令进行创建 `.ts` 或 `.js` 文件
+默认读取 `./uxiu-cli.config.ts`
 
 **示例 1**
 
 ```ts
-// 借助 defindBuild() 函数获取类型提示
-import { defindBuild } from 'uxiu-cli'
+// 借助 defineBuild() 函数获取类型提示
+import { defineBuild } from 'uxiu-cli'
 
-export default defindBuild({
+export default defineBuild({
 	// 书写配置
 })
 ```
+
+- tsdownOptions tsdown 选项, 该选项将覆盖 uxiu-cli 选项
+
+- event 事件
+
+  - beforeBuild 打包前事件, 仅配置文件支持
+
+  - hook:beforeBuild 打包前钩子函数(若返回 Promise 将进行等待), 仅配置文件支持
+
+  - afterBuild 打包后事件, 仅配置文件支持
+
+  - hook:afterBuild 打包后钩子函数(若返回 Promise 将进行等待), 仅配置文件支持
+
+  - error 打包错误事件, 仅配置文件支持
+
+  - hook:error 打包错误事件钩子函数(若返回 Promise 将进行等待), 仅配置文件支持
 
 **示例 2**
 

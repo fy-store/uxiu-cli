@@ -5,5 +5,6 @@ export default defineConfig({
 	format: ['esm'],
 	platform: 'node',
 	exports: true,
-	unbundle: true
+	unbundle: true,
+	nodeProtocol: true
 })
