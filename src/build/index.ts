@@ -9,10 +9,9 @@ import json from '@rollup/plugin-json'
 import { builtinModules } from 'module'
 import dayjs from 'dayjs'
 import conf from '../conf/index.js'
-import { extract, isArray, isFunction, isString } from 'uxiu'
+import { extract, isArray, isFunction, isObject, isString } from 'uxiu'
 import { pathToFileURL } from 'url'
 import { BuildParams, UxiuConfig } from '@/types/index.js'
-import 'tsx/esm' // 用于载入配置文件, 不使用 tsImport() , 防止触发循环
 
 const root = process.cwd()
 
@@ -93,6 +92,10 @@ export async function execute(options: ArgumentsCamelCase<BuildOptions>) {
 		const c = await import(pathToFileURL(fullPath).href)
 
 		const uxiuConfig = c.default as UxiuConfig
+		if (!isObject(uxiuConfig)) {
+			throw new Error('Invalid uxiu-cli config')
+		}
+
 		if (uxiuConfig.beforeBuild) {
 			await uxiuConfig.beforeBuild()
 		}

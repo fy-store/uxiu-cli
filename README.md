@@ -95,7 +95,7 @@ uxiu-cli build
 
 若 `build` 命令已配置 `config` 则按照实际命令进行创建 `.ts` 或 `.js` 文件
 
-**示例**
+**示例 1**
 
 ```ts
 // 借助 defindBuild() 函数获取类型提示
@@ -105,3 +105,14 @@ export default defindBuild({
 	// 书写配置
 })
 ```
+
+**示例 2**
+
+```ts
+// 借助 configToJSON5() 将代码配置转为静态 json5 配置
+import { configToJSON5 } from 'uxiu-cli'
+
+const json5Text = await configToJSON5(path)
+```
+
+- path code 文件绝对路径
