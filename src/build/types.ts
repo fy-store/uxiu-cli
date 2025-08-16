@@ -8,6 +8,14 @@ export type DefaultOptions = {
 	entry?: TsdownOptions['entry']
 	/** 输出目录, 默认值为 './dist' */
 	outDir?: TsdownOptions['outDir']
+	/** 输出格式, 默认值为 'esm' */
+	format: TsdownOptions['format']
+	/** 运行平台, 默认值为 'node' */
+	platform: TsdownOptions['platform']
+	/** 不拆包, 默认为 true */
+	unbundle: TsdownOptions['unbundle']
+	/** node 内置模块添加 node: 前缀, 默认为 true */
+	nodeProtocol: TsdownOptions['nodeProtocol']
 }
 
 export type Ctx = {

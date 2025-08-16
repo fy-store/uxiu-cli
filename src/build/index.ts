@@ -25,35 +25,60 @@ export async function commandHandle(yargs: Argv<CliOptions>) {
 		.option('entry', {
 			alias: 'e',
 			desc: '项目入口文件',
-			type: 'string',
-			default: './src/index.ts'
+			type: 'string'
 		})
 		.option('outDir', {
 			alias: 'o',
 			desc: '输出目录',
-			type: 'string',
-			default: './dist'
+			type: 'string'
+		})
+		.option('format', {
+			alias: 'f',
+			desc: '输出格式',
+			type: 'array'
+		})
+		.option('platform', {
+			alias: 'pl',
+			desc: '运行平台',
+			type: 'string'
+		})
+		.option('unbundle', {
+			alias: 'ub',
+			desc: '不拆包',
+			type: 'boolean'
+		})
+		.option('nodeProtocol', {
+			alias: 'np',
+			desc: 'node 内置模块添加 node: 前缀',
+			type: 'boolean'
 		})
 		.option('config', {
 			alias: 'c',
 			desc: 'uxiu-cli 配置路径',
-			type: 'string',
-			default: './uxiu-cli.config.ts'
+			type: 'string'
 		})
 }
 
 export async function execute(cliOptions: ArgumentsCamelCase<Required<CliOptions>>) {
-	const keys: (keyof DefaultOptions)[] = ['pwd', 'entry', 'outDir']
+	const keys: (keyof DefaultOptions)[] = ['pwd', 'entry', 'outDir', 'format', 'platform', 'unbundle', 'nodeProtocol']
 	const ctx: Ctx = {
 		pwd: cliOptions.pwd,
 		cliOptions,
 		bus: new Event<BuildEvent>(),
 		options: null,
-		tsdownConfig: {} as TsdownConfig
+		tsdownConfig: {
+			pwd: cliOptions.pwd,
+			entry: './src/index.ts',
+			outDir: './dist',
+			format: 'esm',
+			platform: 'node',
+			unbundle: true,
+			nodeProtocol: true
+		} as TsdownConfig
 	}
 
 	// 载入配置文件
-	const configFullPath = path.join(cliOptions.pwd, cliOptions.config)
+	const configFullPath = path.join(ctx.pwd, cliOptions.config)
 	if (fs.existsSync(configFullPath) && fs.statSync(configFullPath).isFile()) {
 		const _c = await import(pathToFileURL(configFullPath).href)
 		const config = _c.default as Options
@@ -77,9 +102,11 @@ export async function execute(cliOptions: ArgumentsCamelCase<Required<CliOptions
 	// 写入命令行参数
 	Object.assign(
 		ctx.tsdownConfig,
-		extract<CliOptions, keyof CliOptions>(cliOptions, [...keys, 'config'], {
-			notValueWriteUndefined: false
-		})
+		keys.reduce((obj, k) => {
+			const v = cliOptions[k]
+			if (v !== void 0) obj[k] = cliOptions[k]
+			return obj
+		}, {})
 	)
 
 	await actuator(ctx)
