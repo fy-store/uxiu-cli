@@ -63,6 +63,14 @@ uxiu-cli create -n [name]
 
 - outDir 别名 -o 打包输出路径, 默认为 `./dist`
 
+- format 别名 -f 输出格式 默认为 `esm`
+
+- platform 别名 -pl 运行平台, 默认值为 `node`
+
+- unbundle 别名 -ub 不拆包, 默认为 `true`
+
+- nodeProtocol 别名 -np node 内置模块添加 `node:` 前缀, 默认为 `true`
+
 - config 别名 -c 打包配置文件路径, 默认为 `./uxiu-cli.config.ts`
 
 **示例**
