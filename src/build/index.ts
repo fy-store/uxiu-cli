@@ -16,6 +16,12 @@ export const describe = '打包项目'
 
 export async function commandHandle(yargs: Argv<CliOptions>) {
 	yargs
+		.option('config', {
+			alias: 'c',
+			desc: 'uxiu-cli 配置路径',
+			type: 'string',
+			default: './uxiu-cli.config.ts'
+		})
 		.option('pwd', {
 			alias: 'p',
 			desc: '项目工作目录',
@@ -51,11 +57,6 @@ export async function commandHandle(yargs: Argv<CliOptions>) {
 			alias: 'np',
 			desc: 'node 内置模块添加 node: 前缀',
 			type: 'boolean'
-		})
-		.option('config', {
-			alias: 'c',
-			desc: 'uxiu-cli 配置路径',
-			type: 'string'
 		})
 }
 
