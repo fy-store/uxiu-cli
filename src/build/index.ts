@@ -7,11 +7,11 @@ import path from 'path/posix'
 import Event from '@yishu/event'
 import dayjs from 'dayjs'
 import conf from '../conf/index.js'
-import { extract, isObject } from 'uxiu'
+import { isObject } from 'uxiu'
 import { pathToFileURL } from 'url'
 
 const rootPath = process.cwd()
-export const command = 'build [pwd] [entry] [outDir] [config]'
+export const command = 'build [config] [pwd] [entry] [outDir] [format] [platform] [unbundle] [nodeProtocol]'
 export const describe = '打包项目'
 
 export async function commandHandle(yargs: Argv<CliOptions>) {
@@ -97,15 +97,20 @@ export async function execute(cliOptions: ArgumentsCamelCase<Required<CliOptions
 
 		if (ctx.bus.has('beforeBuild')) ctx.bus.emit('beforeBuild', ctx)
 		if (ctx.bus.has('hook:beforeBuild')) await ctx.bus.emitLineUp('hook:beforeBuild', ctx)
-		Object.assign(ctx.tsdownConfig, extract(config, keys))
+		Object.assign(
+			ctx.tsdownConfig,
+			keys.reduce((obj, k) => {
+				if (Object.hasOwn(config, k)) obj[k] = config[k]
+				return obj
+			}, {})
+		)
 	}
 
 	// 写入命令行参数
 	Object.assign(
 		ctx.tsdownConfig,
 		keys.reduce((obj, k) => {
-			const v = cliOptions[k]
-			if (v !== void 0) obj[k] = cliOptions[k]
+			if (Object.hasOwn(cliOptions, k)) obj[k] = cliOptions[k]
 			return obj
 		}, {})
 	)
