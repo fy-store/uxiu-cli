@@ -125,8 +125,7 @@ const json5Text = await configToJSON5(path)
 
 ```ts
 // 使用 tsdown
-import { tsdown, type Tsdown } from 'uxiu-cli'
+import { tsdown } from 'uxiu-cli'
 
 tsdown.build // tsdown 包
-Tsdown // tsdown 类型
 ```
