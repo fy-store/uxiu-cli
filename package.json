@@ -47,7 +47,6 @@
   "dependencies": {
     "@inquirer/prompts": "^7.8.2",
     "@oxc-project/runtime": "^0.82.1",
-    "@rollup/plugin-typescript": "^12.1.4",
     "@yishu/event": "^1.0.1",
     "adm-zip": "^0.5.16",
     "dayjs": "^1.11.13",

@@ -120,3 +120,13 @@ const json5Text = await configToJSON5(path)
 ```
 
 - path code 文件绝对路径
+
+**示例 3**
+
+```ts
+// 使用 tsdown
+import { tsdown, type Tsdown } from 'uxiu-cli'
+
+tsdown.build // tsdown 包
+Tsdown // tsdown 类型
+```

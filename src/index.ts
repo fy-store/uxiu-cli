@@ -8,6 +8,7 @@ import { hideBin } from 'yargs/helpers'
 import * as Create from './create/index.js'
 import * as Build from './build/index.js'
 export * from './utils/index.js'
+export * as tsdown from 'tsdown'
 
 if (process.argv.length === 2) {
 	process.argv.push('create')
