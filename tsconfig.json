@@ -1,0 +1,31 @@
+{
+    "compilerOptions": {
+        "esModuleInterop": true,
+        "noEmitOnError": false,
+        "target": "ESNext",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "outDir": "./dist",
+        "baseUrl": "./",
+        "paths": {
+            "@/*": [
+                "./src/*"
+            ]
+        },
+    },
+    "include": [
+        "./src/**/*",
+        "./tests/**/*",
+        "./tsdown.config.ts"
+    ],
+    "lib": [
+        "esnext",
+        "NodeNext"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}
