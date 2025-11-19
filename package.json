@@ -1,13 +1,13 @@
 {
   "type": "module",
   "name": "uxiu-cli",
-  "version": "0.9.0-beta.11",
+  "version": "0.9.0-beta.12",
   "description": "快速创建 koa 项目工具",
-  "main": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
-  "module": "./dist/index.mjs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
   "exports": {
-    ".": "./dist/index.mjs",
+    ".": "./dist/index.js",
     "./package.json": "./package.json"
   },
   "bin": {

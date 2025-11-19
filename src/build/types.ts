@@ -1,4 +1,4 @@
-import type { Options as TsdownOptions } from 'tsdown'
+import type { InlineConfig as TsdownOptions } from 'tsdown'
 import type { Bus } from 'event-imt'
 
 export type DefaultOptions = {
@@ -16,6 +16,11 @@ export type DefaultOptions = {
 	unbundle?: TsdownOptions['unbundle']
 	/** node 内置模块添加 node: 前缀, 默认为 true */
 	nodeProtocol?: TsdownOptions['nodeProtocol']
+	/**
+	 * 输出文件扩展名是否固定, 默认为 false (tsdown 默认为 true, 为防止扩展名变更为 mjs 将其配置为 false)
+	 * - https://tsdown.dev/zh-CN/reference/api/Interface.InlineConfig#fixedextension
+	 */
+	fixedExtension?: TsdownOptions['fixedExtension']
 }
 
 export type Ctx = {

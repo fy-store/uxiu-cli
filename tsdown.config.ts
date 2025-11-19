@@ -6,5 +6,6 @@ export default defineConfig({
 	platform: 'node',
 	exports: true,
 	unbundle: true,
-	nodeProtocol: true
+	nodeProtocol: true,
+	fixedExtension: false
 })

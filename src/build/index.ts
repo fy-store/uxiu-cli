@@ -1,7 +1,7 @@
 import type { ArgumentsCamelCase, Argv } from 'yargs'
 import type { CliOptions, Ctx, DefaultOptions, TsdownConfig } from './types.js'
 import type { Options, BuildEvent } from './types.js'
-import { Options as TsdownOptions, build } from 'tsdown'
+import { InlineConfig as TsdownOptions, build } from 'tsdown'
 import fs from 'fs'
 import path from 'path/posix'
 import Bus from 'event-imt'
@@ -74,7 +74,8 @@ export async function execute(cliOptions: ArgumentsCamelCase<Required<CliOptions
 			format: 'esm',
 			platform: 'node',
 			unbundle: true,
-			nodeProtocol: true
+			nodeProtocol: true,
+			fixedExtension: false
 		} as TsdownConfig
 	}
 
