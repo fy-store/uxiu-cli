@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "uxiu-cli",
-  "version": "0.9.0-beta.10",
+  "version": "0.9.0-beta.11",
   "description": "快速创建 koa 项目工具",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -55,7 +55,7 @@
     "tsdown": "^0.14.1",
     "tsx": "^4.20.4",
     "typescript": "^5.9.2",
-    "uxiu": "0.20.0-alpha.7",
+    "uxiu": "0.20.0-alpha.9",
     "yargs": "^17.7.2"
   }
 }
