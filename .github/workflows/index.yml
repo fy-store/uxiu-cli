@@ -33,7 +33,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run unit tests
-        run: pnpm test:run
+        run: pnpm test
 
   publish-npm:
     name: Publish npm package
@@ -64,7 +64,7 @@ jobs:
         run: npm install --global npm@latest
 
       - name: Build package
-        run: pnpm build:core
+        run: pnpm build
 
       - name: Check package version
         id: package
