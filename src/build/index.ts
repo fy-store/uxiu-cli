@@ -141,7 +141,8 @@ async function actuator(ctx: Ctx) {
 	}
 
 	console.log('')
-	console.log(config.color(`${config.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 开始构建...`), '\n')
+	console.log(config.color(`${config.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 开始构建...`))
+	console.log('')
 	const startTimer = Date.now()
 
 	try {
@@ -166,19 +167,20 @@ async function actuator(ctx: Ctx) {
 		if (ctx.bus.has('afterBuild')) ctx.bus.emit('afterBuild', ctx)
 		if (ctx.bus.has('hook:afterBuild')) await ctx.bus.emitLineUp('hook:afterBuild', ctx)
 
+		console.log('')
 		console.log(
-			'\n',
 			config.color(
 				`${config.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 构建完成，耗时 ${
 					(Date.now() - startTimer) / 1000
 				} 秒`
-			),
-			'\n'
+			)
 		)
+		console.log('')
 	} catch (error) {
 		if (ctx.bus.has('error')) ctx.bus.emit('error', ctx, error)
 		if (ctx.bus.has('hook:error')) await ctx.bus.emitLineUp('hook:error', ctx, error)
-		console.log(config.dangerColor(`${config.errorEmoji} 构建失败，错误信息：`), '\n')
+		console.log(config.dangerColor(`${config.errorEmoji} 构建失败，错误信息：`))
+		console.log('')
 		throw error
 	}
 }

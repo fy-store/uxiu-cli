@@ -60,7 +60,8 @@ export async function execute(options: ArgumentsCamelCase<CreateOptions>) {
 				const fullPath = path.join(root, value)
 				if (fs.existsSync(fullPath) && fs.statSync(fullPath).isDirectory()) {
 					console.log('')
-					console.log(config.dangerColor(`${config.errorEmoji} "${value}" 文件夹已存在，请更换名称或移除`), '\n')
+					console.log(config.dangerColor(`${config.errorEmoji} "${value}" 文件夹已存在，请更换名称或移除`))
+					console.log('')
 				} else {
 					name = value
 				}
@@ -113,52 +114,63 @@ export async function execute(options: ArgumentsCamelCase<CreateOptions>) {
 
 async function actuator(params: CreateParams) {
 	console.log('')
-	console.log(config.color(`${config.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 正在下载模板...`), '\n')
+	console.log(config.color(`${config.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 正在下载模板...`))
+	console.log('')
 	const resource = await getResource(params)
 	console.log(
-		config.color(`${config.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 模板下载完成, 正在解压...`),
-		'\n'
+		config.color(`${config.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 模板下载完成, 正在解压...`)
 	)
+	console.log('')
 
 	// 解压文件
 	const zip = new AdmZip(resource)
 	const zipEntries = zip.getEntries()
 	if (zipEntries.length === 0) {
-		console.log(config.dangerColor(`${config.errorEmoji}ZIP 文件为空或解析失败 !`), '\n')
+		console.log(config.dangerColor(`${config.errorEmoji}ZIP 文件为空或解析失败 !`))
+		console.log('')
 		return
 	}
 
 	// 复制文件
-	await Promise.all(zipEntries.map(async (entry) => {
-		if (entry.isDirectory) return
-		const template = config.templates[params.templateId as keyof typeof config.templates]
-		const entryName = entry.entryName.replace(`${template.replaceName}/`, '')
-		if (entryName === '') return
-		if (entryName === 'package.json') {
-			const content = JSON.parse(entry.getData().toString('utf8'))
-			content.name = params.name
-			content.version = '0.0.0'
-			const filePath = path.join(params.root, params.name, entryName)
-			await fs.promises.mkdir(path.dirname(filePath), { recursive: true })
-			await fs.promises.writeFile(filePath, JSON.stringify(content, null, 2), 'utf8')
-		} else {
-			const filePath = path.join(params.root, params.name, entryName)
-			await fs.promises.mkdir(path.dirname(filePath), { recursive: true })
-			await fs.promises.writeFile(filePath, entry.getData())
-		}
-	}))
+	await Promise.all(
+		zipEntries.map(async (entry) => {
+			if (entry.isDirectory) return
+			const template = config.templates[params.templateId as keyof typeof config.templates]
+			const entryName = entry.entryName.replace(`${template.replaceName}/`, '')
+			if (entryName === '') return
+			if (entryName === 'package.json') {
+				const content = JSON.parse(entry.getData().toString('utf8'))
+				content.name = params.name
+				content.version = '0.0.0'
+				const filePath = path.join(params.root, params.name, entryName)
+				await fs.promises.mkdir(path.dirname(filePath), { recursive: true })
+				await fs.promises.writeFile(filePath, JSON.stringify(content, null, 2), 'utf8')
+			} else {
+				const filePath = path.join(params.root, params.name, entryName)
+				await fs.promises.mkdir(path.dirname(filePath), { recursive: true })
+				await fs.promises.writeFile(filePath, entry.getData())
+			}
+		})
+	)
 
-	console.log(config.color(`${config.successEmoji} ${params.name}: 创建成功 ${dayjs().format('YYYY/MM/DD HH:mm:ss')}`), '\n')
+	console.log(
+		config.color(`${config.successEmoji} ${params.name}: 创建成功 ${dayjs().format('YYYY/MM/DD HH:mm:ss')}`),
+		'\n'
+	)
 	const p = path.join(params.root, params.name).replaceAll('\\', '/')
 	const r = path.join(root).replaceAll('\\', '/')
 	if (p.startsWith(r)) {
 		const relativePath = p.replace(r, '')
-		console.log(config.color(`1. cd ${relativePath.startsWith('/') ? relativePath.slice(1) : relativePath}`), '\n')
+		console.log(config.color(`1. cd ${relativePath.startsWith('/') ? relativePath.slice(1) : relativePath}`))
+		console.log('')
 	} else {
-		console.log(config.color(`1. cd ${p}`), '\n')
+		console.log(config.color(`1. cd ${p}`))
+		console.log('')
 	}
-	console.log(config.color(`2. npm | pnpm i`), '\n')
-	console.log(config.color(`3. npm | pnpm dev`), '\n')
+	console.log(config.color(`2. npm | pnpm i`))
+	console.log('')
+	console.log(config.color(`3. npm | pnpm dev`))
+	console.log('')
 }
 
 /** 获取模板资源 */
@@ -181,23 +193,27 @@ async function getResource(options: GetResourceOptions): Promise<Buffer<ArrayBuf
 				if (err instanceof FetchError) {
 					switch (err.type) {
 						case 'network':
-							console.log(config.dangerColor(`${config.errorEmoji} 网络异常，请检查连接`), '\n')
+							console.log(config.dangerColor(`${config.errorEmoji} 网络异常，请检查连接`))
+							console.log('')
 							break
 						case 'http':
 							console.log(
-								config.dangerColor(`${config.errorEmoji} 服务器 ${err.status} 错误: ${err.response?.statusText || ''}`),
-								'\n'
+								config.dangerColor(`${config.errorEmoji} 服务器 ${err.status} 错误: ${err.response?.statusText || ''}`)
 							)
+							console.log('')
 							break
 						case 'timeout':
-							console.log(config.dangerColor(`${config.errorEmoji} 请求超时`), '\n')
+							console.log(config.dangerColor(`${config.errorEmoji} 请求超时`))
+							console.log('')
 							break
 						default:
-							console.log(config.dangerColor(`${config.errorEmoji} 未知错误`), '\n')
+							console.log(config.dangerColor(`${config.errorEmoji} 未知错误`))
+							console.log('')
 							break
 					}
 				} else {
-					console.log(config.dangerColor(`${config.errorEmoji} 获取模板资源失败, 未知错误`), '\n')
+					console.log(config.dangerColor(`${config.errorEmoji} 获取模板资源失败, 未知错误`))
+					console.log('')
 					throw err
 				}
 			} else {
