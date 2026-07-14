@@ -46,8 +46,8 @@ export const config = {
 	tipColor(text: string) {
 		return styleText('gray', text)
 	},
-	successEmoji: '✔ 🤤',
-	errorEmoji: '✖ 🤤',
+	successEmoji: '√ 🤤',
+	errorEmoji: '✗ 🤤',
 	doubtEmoji: '? 🤤',
 	byeEmoji: '🤤 🤤 🤤'
 }
