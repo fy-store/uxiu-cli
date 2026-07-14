@@ -1,13 +1,12 @@
 import type { ArgumentsCamelCase, Argv } from 'yargs'
 import type { CliOptions, Ctx, DefaultOptions, TsdownConfig } from './types.js'
 import type { Options, BuildEvent } from './types.js'
-import { InlineConfig as TsdownOptions, build } from 'tsdown'
+import { type InlineConfig as TsdownOptions, build } from 'tsdown'
 import fs from 'fs'
 import path from 'path/posix'
-import Bus from 'event-imt'
+import { Bus, type InterfaceToType } from 'event-imt'
 import dayjs from 'dayjs'
-import conf from '../conf/index.js'
-import { isObject } from 'uxiu'
+import { config } from '../config/index.js'
 import { pathToFileURL } from 'url'
 
 const rootPath = process.cwd()
@@ -65,7 +64,7 @@ export async function execute(cliOptions: ArgumentsCamelCase<Required<CliOptions
 	const ctx: Ctx = {
 		pwd: cliOptions.pwd,
 		cliOptions,
-		bus: new Bus<BuildEvent>(),
+		bus: new Bus<InterfaceToType<BuildEvent>>(),
 		options: null,
 		tsdownConfig: {
 			pwd: cliOptions.pwd,
@@ -84,36 +83,52 @@ export async function execute(cliOptions: ArgumentsCamelCase<Required<CliOptions
 	if (fs.existsSync(configFullPath) && fs.statSync(configFullPath).isFile()) {
 		const _c = await import(pathToFileURL(configFullPath).href)
 		const config = _c.default as Options
-		if (!isObject(config)) {
+		if (!(typeof config === 'object' && config !== null)) {
 			throw new Error('Invalid uxiu-cli config')
 		}
-
 		ctx.options = config
 
-		if (config.event) {
-			Object.keys(config.event).forEach((key) => {
-				ctx.bus.on(key, config.event[key])
+		// 注册事件
+		const { event } = config
+		if (event) {
+			;(Object.keys(event) as (keyof BuildEvent)[]).forEach((key: keyof BuildEvent) => {
+				if (typeof event[key] === 'function') {
+					ctx.bus.on(key, event[key])
+				}
 			})
 		}
 
 		if (ctx.bus.has('beforeBuild')) ctx.bus.emit('beforeBuild', ctx)
 		if (ctx.bus.has('hook:beforeBuild')) await ctx.bus.emitLineUp('hook:beforeBuild', ctx)
+		// 写入打包参数
 		Object.assign(
 			ctx.tsdownConfig,
-			keys.reduce((obj, k) => {
-				if (Object.hasOwn(config, k)) obj[k] = config[k]
-				return obj
-			}, {})
+			keys.reduce(
+				(obj, k) => {
+					if (Object.hasOwn(config, k)) {
+						const value = config[k]
+						obj[k] = value
+					}
+					return obj
+				},
+				{} as Record<keyof TsdownConfig, TsdownConfig[keyof TsdownConfig]>
+			)
 		)
 	}
 
 	// 写入命令行参数
 	Object.assign(
 		ctx.tsdownConfig,
-		keys.reduce((obj, k) => {
-			if (Object.hasOwn(cliOptions, k)) obj[k] = cliOptions[k]
-			return obj
-		}, {})
+		keys.reduce(
+			(obj, k) => {
+				if (Object.hasOwn(cliOptions, k)) {
+					const value = cliOptions[k]
+					obj[k] = value
+				}
+				return obj
+			},
+			{} as Record<keyof TsdownConfig, TsdownConfig[keyof TsdownConfig]>
+		)
 	)
 
 	await actuator(ctx)
@@ -126,7 +141,7 @@ async function actuator(ctx: Ctx) {
 	}
 
 	console.log('')
-	console.log(conf.color(`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 开始构建...`), '\n')
+	console.log(config.color(`${config.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 开始构建...`), '\n')
 	const startTimer = Date.now()
 
 	try {
@@ -153,8 +168,8 @@ async function actuator(ctx: Ctx) {
 
 		console.log(
 			'\n',
-			conf.color(
-				`${conf.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 构建完成，耗时 ${
+			config.color(
+				`${config.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 构建完成，耗时 ${
 					(Date.now() - startTimer) / 1000
 				} 秒`
 			),
@@ -163,7 +178,7 @@ async function actuator(ctx: Ctx) {
 	} catch (error) {
 		if (ctx.bus.has('error')) ctx.bus.emit('error', ctx, error)
 		if (ctx.bus.has('hook:error')) await ctx.bus.emitLineUp('hook:error', ctx, error)
-		console.log(conf.dangerColor(`${conf.errorEmoji} 构建失败，错误信息：`), '\n')
+		console.log(config.dangerColor(`${config.errorEmoji} 构建失败，错误信息：`), '\n')
 		throw error
 	}
 }

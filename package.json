@@ -1,11 +1,9 @@
 {
   "type": "module",
   "name": "uxiu-cli",
-  "version": "0.9.0-beta.12",
+  "version": "0.9.0",
   "description": "快速创建 koa 项目工具",
-  "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "module": "./dist/index.js",
   "exports": {
     ".": "./dist/index.js",
     "./package.json": "./package.json"
@@ -16,6 +14,8 @@
   "scripts": {
     "dev": "tsdown --watch",
     "build": "tsdown",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:create": "tsx ./tests/create.ts",
     "test:build": "tsx ./tests/build.ts"
   },
@@ -24,10 +24,7 @@
     "uxiu"
   ],
   "engines": {
-    "node": "^20.0.0 || >=22.0.0"
-  },
-  "volta": {
-    "node": "22.18.0"
+    "node": ">=22.18.0"
   },
   "files": [
     "./dist",
@@ -40,22 +37,21 @@
   "author": "feiYu <feiyucode@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@types/adm-zip": "^0.5.7",
-    "@types/node": "^22.17.1",
-    "@types/yargs": "^17.0.33"
+    "@types/adm-zip": "^0.5.8",
+    "@types/node": "^26.1.0",
+    "@types/yargs": "^17.0.35",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
   },
   "dependencies": {
-    "@inquirer/prompts": "^7.8.2",
-    "@oxc-project/runtime": "^0.82.1",
-    "adm-zip": "^0.5.16",
-    "dayjs": "^1.11.13",
-    "event-imt": "^0.1.0",
-    "execa": "^9.6.0",
-    "picocolors": "^1.1.1",
-    "tsdown": "^0.16.5",
-    "tsx": "^4.20.4",
-    "typescript": "^5.9.2",
-    "uxiu": "0.20.0-alpha.9",
-    "yargs": "^17.7.2"
+    "@inquirer/prompts": "^8.5.2",
+    "@oxc-project/runtime": "^0.138.0",
+    "adm-zip": "^0.5.18",
+    "dayjs": "^1.11.21",
+    "event-imt": "^0.2.7",
+    "execa": "^9.6.1",
+    "tsdown": "^0.22.3",
+    "tsx": "^4.23.0",
+    "yargs": "^18.0.0"
   }
 }

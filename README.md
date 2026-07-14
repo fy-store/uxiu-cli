@@ -6,7 +6,7 @@ pnpm i -g uxiu-cli
 npm i -g uxiu-cli
 
 # 使用以下方式临时运行
-pnpx uxiu-cli
+pnpm dlx uxiu-cli
 # or
 npx uxiu-cli
 ```
@@ -111,17 +111,6 @@ export default defineBuild({
   - hook:error 打包错误事件钩子函数(若返回 Promise 将进行等待), 仅配置文件支持
 
 **示例 2**
-
-```ts
-// 借助 configToJSON5() 将代码配置转为静态 json5 配置
-import { configToJSON5 } from 'uxiu-cli'
-
-const json5Text = await configToJSON5(path)
-```
-
-- path code 文件绝对路径
-
-**示例 3**
 
 ```ts
 // 使用 tsdown

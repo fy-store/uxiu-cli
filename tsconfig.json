@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "strict": true,
         "esModuleInterop": true,
         "noEmitOnError": false,
         "target": "ESNext",
@@ -8,7 +9,6 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "outDir": "./dist",
-        "baseUrl": "./",
         "paths": {
             "@/*": [
                 "./src/*"

@@ -1,2 +1,6 @@
+allowBuilds:
+  typescript: true
+  esbuild: true
 onlyBuiltDependencies:
   - esbuild
+  - typescript

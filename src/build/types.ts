@@ -1,5 +1,5 @@
 import type { InlineConfig as TsdownOptions } from 'tsdown'
-import type { Bus } from 'event-imt'
+import type { Bus, InterfaceToType } from 'event-imt'
 
 export type DefaultOptions = {
 	/** 配置文件运行根目录, 默认值为当前工作目录(process.cwd()) */
@@ -33,23 +33,22 @@ export type Ctx = {
 	/** tsdown 打包参数 */
 	tsdownConfig: TsdownConfig
 	/** 事件总线 */
-	bus: Bus<BuildEvent>
+	bus: Bus<InterfaceToType<BuildEvent>>
 }
 
 export interface BuildEvent {
 	/** 打包前事件 */
 	beforeBuild?: (ctx: Ctx) => void
 	/** 打包前钩子函数, 返回 Promise 将进行等待 */
-	'hook:beforeBuild'?: (ctx: Ctx) => Promise<void> | void
+	'hook:beforeBuild'?: (ctx: Ctx) => Promise<void>
 	/** 打包后事件 */
 	afterBuild?: (ctx: Ctx) => void
 	/** 打包后钩子函数, 返回 Promise 将进行等待 */
-	'hook:afterBuild'?: (ctx: Ctx) => Promise<void> | void
+	'hook:afterBuild'?: (ctx: Ctx) => Promise<void>
 	/** 打包错误事件 */
 	error?: (ctx: Ctx, error: any) => void
 	/** 打包错误钩子函数, 返回 Promise 将进行等待 */
-	'hook:error'?: (ctx: Ctx, error: any) => Promise<void> | void
-	[k: symbol]: (...args: any[]) => any
+	'hook:error'?: (ctx: Ctx, error: any) => Promise<void>
 }
 
 type BaseOptions = {

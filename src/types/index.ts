@@ -1,7 +1,7 @@
 export type * from '../utils/index.js'
 export * from '../build/types.js'
 export type * as TsdownType from 'tsdown'
-export type { Options as TsdownOptions } from 'tsdown'
+export type { InlineConfig as TsdownOptions } from 'tsdown'
 
 export interface CreateOptions {
 	n?: string
