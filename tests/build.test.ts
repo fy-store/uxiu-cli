@@ -37,7 +37,9 @@ describe('build execute', () => {
 		expect(buildMock).toHaveBeenCalledOnce()
 		expect(buildMock).toHaveBeenCalledWith({
 			pwd,
-			entry: './src/index.ts',
+			entry: {
+				'src/index': './src/'
+			},
 			outDir: './dist',
 			format: 'esm',
 			platform: 'node',
@@ -113,9 +115,9 @@ describe('build execute', () => {
 		expect(outputPackage).toEqual({
 			name: 'demo-service',
 			version: '1.2.3',
-			scripts: { start: 'node ./index.js' },
+			scripts: { start: 'node ./src/index.js' },
 			dependencies: { koa: '^3.0.0' },
-			main: './index.js'
+			main: './src/index.js'
 		})
 	})
 
