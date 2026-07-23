@@ -65,4 +65,4 @@ export type CliOptions = {
 	config?: string
 } & DefaultOptions
 
-export type TsdownConfig = Required<DefaultOptions & CliOptions> & BaseOptions
+export type TsdownConfig = Required<DefaultOptions> & CliOptions & BaseOptions

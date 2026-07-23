@@ -68,7 +68,9 @@ export async function execute(cliOptions: ArgumentsCamelCase<Required<CliOptions
 		options: null,
 		tsdownConfig: {
 			pwd: cliOptions.pwd,
-			entry: './src/index.ts',
+			entry: {
+				'src/index': './src/'
+			},
 			outDir: './dist',
 			format: 'esm',
 			platform: 'node',
@@ -151,9 +153,9 @@ async function actuator(ctx: Ctx) {
 		const packagePath = path.join(ctx.pwd, 'package.json')
 		if (fs.existsSync(packagePath)) {
 			const content = JSON.parse(fs.readFileSync(packagePath, 'utf8'))
-			content.main = './index.js'
+			content.main = './src/index.js'
 			content.scripts = {
-				start: 'node ./index.js'
+				start: 'node ./src/index.js'
 			}
 			delete content.devDependencies
 			fs.writeFileSync(

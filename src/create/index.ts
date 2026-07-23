@@ -116,14 +116,17 @@ async function actuator(params: CreateParams) {
 	console.log('')
 	console.log(config.color(`${config.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 正在下载模板...`))
 	console.log('')
-	const resource = await getResource(params)
+	const { res, success } = await getResource(params)
+	if (!success) {
+		return
+	}
 	console.log(
 		config.color(`${config.successEmoji} ${dayjs().format('YYYY/MM/DD HH:mm:ss')}: 模板下载完成, 正在解压...`)
 	)
 	console.log('')
 
 	// 解压文件
-	const zip = new AdmZip(resource)
+	const zip = new AdmZip(res)
 	const zipEntries = zip.getEntries()
 	if (zipEntries.length === 0) {
 		console.log(config.dangerColor(`${config.errorEmoji}ZIP 文件为空或解析失败 !`))
@@ -174,9 +177,10 @@ async function actuator(params: CreateParams) {
 }
 
 /** 获取模板资源 */
-async function getResource(options: GetResourceOptions): Promise<Buffer<ArrayBuffer>> {
+async function getResource(options: GetResourceOptions): Promise<{ res: Buffer<ArrayBuffer>; success: boolean }> {
 	const template = config.templates[options.templateId as keyof typeof config.templates]
 	let res: Buffer<ArrayBuffer>
+	let success = false
 	for (let i = 0; i < template.list.length; i++) {
 		const it = template.list[i]
 		try {
@@ -188,8 +192,10 @@ async function getResource(options: GetResourceOptions): Promise<Buffer<ArrayBuf
 			})
 			fs.writeFileSync('./test.zip', Buffer.from(response.data))
 			res = Buffer.from(response.data)
+			success = true
 		} catch (err) {
 			if (i === template.list.length - 1) {
+				success = false
 				if (err instanceof FetchError) {
 					switch (err.type) {
 						case 'network':
@@ -221,5 +227,8 @@ async function getResource(options: GetResourceOptions): Promise<Buffer<ArrayBuf
 			}
 		}
 	}
-	return res!
+	return {
+		res: res!,
+		success
+	}
 }
